@@ -136,6 +136,8 @@ end
             print("Executed loadstring after 15 seconds.")
         end
 
+collectAllBonds()
+updateBondCount()
 
 task.spawn(function()
     task.wait(2)
