@@ -133,11 +133,6 @@ task.spawn(function()
         safeTeleport(pos)
         task.wait(duration)
 
-task.spawn(function()
-    for _, pos in ipairs(positions) do
-        safeTeleport(pos)
-        task.wait(duration)
-
         -- ✅ **Force Bond collection if reaching (-424, 3, -49032)**
         if pos == Vector3.new(-424, 3, -49032) then
             print("Reached bond-heavy location! Collecting all Bonds before continuing...")
