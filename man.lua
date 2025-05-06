@@ -23,7 +23,7 @@ local positions = {
 }
 
 local duration = 0.5
-local bondPauseDuration = 0.7
+local bondPauseDuration = 0.5
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -81,8 +81,10 @@ end
 
 local function safeTeleport(position)
     pcall(function()
-        game.Players.LocalPlayer:RequestStreamAroundAsync(position) -- Preload the location
-        task.wait(0.3) -- Allow streaming delay
+        task.spawn(function() -- Stream while teleporting instead of waiting
+            game.Players.LocalPlayer:RequestStreamAroundAsync(position)
+        end)
+        task.wait(0.2) -- Lowered streaming delay
         hrp.CFrame = CFrame.new(position) -- Teleport after streaming
     end)
 end
@@ -131,41 +133,8 @@ task.spawn(function()
         safeTeleport(pos)
         task.wait(duration)
 
-        if pos == Vector3.new(57, 3, -49032) then
-            print("Reached final position, waiting 15 seconds...")
-            task.wait(15) -- Wait before executing loadstring
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
-            print("Executed loadstring after 15 seconds.")
-        end
-                        
-        -- **Now collects all Bonds first before teleporting back**
-        collectAllBonds()
+        collectAllBonds() -- **Now collects all Bonds first before teleporting back**
 
         updateBondCount()
-    end
-end)
-
-task.spawn(function()
-    task.wait(2)
-
-    while true do
-        task.wait(0.1)
-
-        local items = game.Workspace:WaitForChild("RuntimeItems")
-
-        for _, bond in pairs(items:GetChildren()) do
-            if bond:IsA("Model") and bond.Name == "Bond" and bond.PrimaryPart then
-                local dist = (bond.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-                if dist < 100 then
-                    game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Network"):WaitForChild("RemotePromise"):WaitForChild("Remotes"):WaitForChild("C_ActivateObject"):FireServer(bond)
-                    print("Bond collected:", bond.Name)
-
-                    -- **Remove Bond from memory after collection**
-                    foundBonds[bond.PrimaryPart.Position] = nil
-                end
-            else
-                warn("PrimaryPart missing or object name mismatch for Bond!")
-            end
-        end
     end
 end)
