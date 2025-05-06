@@ -19,7 +19,7 @@ local positions = {
     Vector3.new(57, 3, -38000), Vector3.new(57, 3, -40000),
     Vector3.new(57, 3, -42000), Vector3.new(57, 3, -44000),
     Vector3.new(57, 3, -46000), Vector3.new(57, 3, -48000),
-    Vector3.new(57, 3, -49032), Vector3.new(-424, 3, -49032)
+    Vector3.new(-423, 3, -49029), Vector3.new(-424, 3, -49032)
 }
 
 local duration = 0.5
@@ -128,66 +128,13 @@ local function collectAllBonds()
     end
 end
 
-if pos == Vector3.new(-424, 3, -49032) then
-    print("Final position reached! Searching for nearby Bonds...")
 
-    local function findClosestBond()
-        local items = workspace:WaitForChild("RuntimeItems"):GetChildren()
-        local closestBond, closestDist = nil, math.huge
-
-        for _, bond in ipairs(items) do
-            if bond:IsA("Model") and bond.PrimaryPart then
-                local dist = (bond.PrimaryPart.Position - hrp.Position).Magnitude
-                if dist < closestDist then
-                    closestBond = bond.PrimaryPart.Position
-                    closestDist = dist
-                end
-            end
-        end
-
-        return closestBond
-    end
-
-    local function remainingBonds()
-        local count = 0
-        for _, bond in ipairs(workspace.RuntimeItems:GetChildren()) do
-            if bond:IsA("Model") and bond.PrimaryPart then
-                count += 1
-            end
-        end
-        return count
-    end
-
-    -- ✅ **Loop until all Bonds are collected before moving forward**
-    repeat
-        local bondPos = findClosestBond()
-        if bondPos then
-            print("Teleporting to closest Bond at:", bondPos)
-            safeTeleport(bondPos)
-            task.wait(bondPauseDuration)
-            collectAllBonds()
-            updateBondCount()
-        end
-    until remainingBonds() == 0 -- ✅ **Ensures NO Bonds are left before continuing**
-
-    print("All Bonds collected. Resuming normal teleportation.")
-end
-
-
-        -- Loadstring execution when reaching (57, 3, -49032)
-        if pos == Vector3.new(57, 3, -49032) then
+        if pos == Vector3.new(-423, 3, -49029) then
             print("Reached final position, waiting 15 seconds...")
             task.wait(15)
             loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
             print("Executed loadstring after 15 seconds.")
         end
-
-        -- Normal teleportation after Bond collection
-        collectAllBonds()
-        updateBondCount()
-    end
-end)
-
 
 
 task.spawn(function()
@@ -221,5 +168,4 @@ task.spawn(function()
         end
     end
 end)
-
 
