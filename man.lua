@@ -63,7 +63,7 @@ local function tweenToPosition(targetPosition)
 
     local LocalPlayer = game.Players.LocalPlayer
     LocalPlayer:RequestStreamAroundAsync(targetPosition) -- Preload the location
-    task.wait(1) -- Allow time for assets to load
+    task.wait(0.2) -- Allow time for assets to load
 
     disableCollisions() -- Prevent physics interference
 
