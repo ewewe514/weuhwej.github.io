@@ -22,7 +22,7 @@ local positions = {
     Vector3.new(57, 3, -49032), Vector3.new(-424, 3, -49032)
 }
 
-local duration = 0.5
+local duration = 0.7
 local bondPauseDuration = 0.7
 
 local player = game.Players.LocalPlayer
@@ -48,7 +48,7 @@ task.spawn(function()
     screenGui:Destroy()
 end)
 
-local foundBonds = {}
+local foundBonds = {} -- Stores bonds that have been collected
 local bondCount = 0
 
 local function updateBondCount()
@@ -71,7 +71,12 @@ local function collectAllBonds()
     for _, bond in ipairs(bonds) do
         if bond:IsA("Model") and bond.PrimaryPart and (bond.Name == "Bond" or bond.Name == "Bonds") then
             local bondPos = bond.PrimaryPart.Position
-            table.insert(visitedPositions, bondPos)
+
+            -- **Only teleport if the Bond hasn't been collected yet**
+            if not foundBonds[bondPos] then
+                foundBonds[bondPos] = true -- Mark Bond as collected
+                table.insert(visitedPositions, bondPos)
+            end
         end
     end
 
@@ -130,6 +135,9 @@ task.spawn(function()
                 if dist < 100 then
                     game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Network"):WaitForChild("RemotePromise"):WaitForChild("Remotes"):WaitForChild("C_ActivateObject"):FireServer(bond)
                     print("Bond collected:", bond.Name)
+
+                    -- **Remove Bond from memory after collection**
+                    foundBonds[bond.PrimaryPart.Position] = nil
                 end
             else
                 warn("PrimaryPart missing or object name mismatch for Bond!")
