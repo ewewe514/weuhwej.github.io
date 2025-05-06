@@ -63,6 +63,7 @@ local function safeTeleport(position)
     end)
 end
 
+-- **Updated Bond Collection Function**
 local function collectAllBonds()
     local bonds = workspace.RuntimeItems:GetChildren()
     local visitedPositions = {}
@@ -70,17 +71,29 @@ local function collectAllBonds()
     for _, bond in ipairs(bonds) do
         if bond:IsA("Model") and bond.PrimaryPart and (bond.Name == "Bond" or bond.Name == "Bonds") then
             local bondPos = bond.PrimaryPart.Position
-
-            -- Store all Bonds first before teleporting back
             table.insert(visitedPositions, bondPos)
         end
     end
 
-    -- Teleport to each Bond first before continuing movement
+    -- **Teleport only to Bonds that still exist**
     for _, bondPos in ipairs(visitedPositions) do
-        safeTeleport(bondPos)
-        print("Bond found! Teleporting to " .. tostring(bondPos))
-        task.wait(bondPauseDuration)
+        local bondStillExists = false
+
+        -- Check if the Bond still exists in `workspace.RuntimeItems`
+        for _, bond in ipairs(workspace.RuntimeItems:GetChildren()) do
+            if bond:IsA("Model") and bond.PrimaryPart and bond.PrimaryPart.Position == bondPos then
+                bondStillExists = true
+                break
+            end
+        end
+
+        if bondStillExists then
+            safeTeleport(bondPos)
+            print("Bond found! Teleporting to " .. tostring(bondPos))
+            task.wait(bondPauseDuration)
+        else
+            print("Skipped deleted Bond at: " .. tostring(bondPos))
+        end
     end
 end
 
