@@ -41,17 +41,26 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Bond Detection Function (Detects **ALL** Bond models)
+-- Bond Detection Function (Detects **ONLY** Bonds, prevents duplicates)
 local function checkForBonds()
-    for _, bondModel in pairs(workspace.RuntimeItems:GetChildren()) do
+    for _, bondModel in pairs(workspace.RuntimeItems:GetDescendants()) do
         if bondModel:IsA("Model") and bondModel.Name == "Bond" and bondModel.PrimaryPart then
             local bondPosition = bondModel.PrimaryPart.Position
             
-            -- Debugging: Verify detection of **ALL** Bonds
-            print("Detected Bond at:", bondPosition)
+            -- Ensure it's not a duplicate bond position
+            local alreadyStored = false
+            for _, storedPos in ipairs(bondPositions) do
+                if (storedPos - bondPosition).Magnitude < 1 then
+                    alreadyStored = true
+                    break
+                end
+            end
 
-            bondCount += 1
-            table.insert(bondPositions, bondPosition)
+            if not alreadyStored then
+                bondCount += 1
+                table.insert(bondPositions, bondPosition)
+                print("Detected Bond at:", bondPosition) -- Debugging verification
+            end
         end
     end
     bondCounter.Text = "Bonds Found: " .. bondCount
@@ -68,7 +77,7 @@ for z = startZ, endZ, stepZ do
     tween:Play()
     tween.Completed:Wait()
     
-    checkForBonds() -- No range restriction—detects ALL Bonds
+    checkForBonds() -- Now detecting **ONLY** Bond models
 end
 
 print("Tweening complete. Total Bonds Found: " .. bondCount)
