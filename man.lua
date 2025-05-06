@@ -138,3 +138,37 @@ task.spawn(function()
         updateBondCount()
     end
 end)
+
+task.spawn(function()
+    task.wait(2)
+
+    while true do
+        task.wait(0.1)
+
+        local items = game.Workspace:WaitForChild("RuntimeItems")
+
+        for _, bond in pairs(items:GetChildren()) do
+            if bond:IsA("Model") and bond.Name == "Bond" and bond.PrimaryPart then
+                local dist = (bond.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                
+                if dist < 100 then
+                    -- **Parallel Bond Collection**
+                    task.spawn(function() 
+                        game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+                        :WaitForChild("Network"):WaitForChild("RemotePromise")
+                        :WaitForChild("Remotes"):WaitForChild("C_ActivateObject")
+                        :FireServer(bond)
+                        print("Bond collected:", bond.Name)
+                        
+                        -- **Immediately mark Bond as collected**
+                        foundBonds[bond.PrimaryPart.Position] = nil
+                    end)
+                end
+            else
+                warn("PrimaryPart missing or object name mismatch for Bond!")
+            end
+        end
+    end
+end)
+
+
