@@ -48,17 +48,38 @@ local function updateBondCount()
     bondCounter.Text = "Bonds Found: " .. tostring(bondCount)
 end
 
--- Tween teleportation function
+-- Ensure physics issues don’t stop movement
+local function disableCollisions()
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+end
+
+-- Tween teleportation function (Ensures Execution Continues Even If a Tween Fails)
 local function tweenToPosition(targetPosition)
+    print("Attempting to move to: ", targetPosition) -- Debugging
+
     local LocalPlayer = game.Players.LocalPlayer
     LocalPlayer:RequestStreamAroundAsync(targetPosition) -- Preload the location
-    task.wait(0.3) -- Allow streaming before moving
+    task.wait(1) -- Allow time for assets to load
+
+    disableCollisions() -- Prevent physics interference
 
     local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
     local tween = TweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(targetPosition)})
-    
-    tween:Play()
-    tween.Completed:Wait()
+
+    local success, err = pcall(function()
+        tween:Play()
+        tween.Completed:Connect(function()
+            print("Tween completed: ", targetPosition) -- Debugging confirmation
+        end)
+    end)
+
+    if not success then
+        warn("Tween failed at position: " .. tostring(targetPosition) .. " | Error: " .. err)
+    end
 end
 
 -- Bond Detection Function
