@@ -19,8 +19,8 @@ local positions = {
     Vector3.new(57, 3, -49032),
 }
 
-local duration = 0.9
-local bondPauseDuration = 0.9
+local duration = 0.7
+local bondPauseDuration = 0.7
 local foundBonds = {}
 local bondCount = 0
 
@@ -52,7 +52,7 @@ end
 local function tweenToPosition(targetPosition)
     local LocalPlayer = game.Players.LocalPlayer
     LocalPlayer:RequestStreamAroundAsync(targetPosition) -- Preload the location
-    task.wait(0.5) -- Allow streaming before moving
+    task.wait(0.3) -- Allow streaming before moving
 
     local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
     local tween = TweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(targetPosition)})
