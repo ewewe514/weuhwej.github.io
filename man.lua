@@ -56,11 +56,11 @@ local function checkForBonds(currentPos)
     bondCounter.Text = "Bonds Found: " .. bondCount
 end
 
--- Instant Teleport Loop
+-- Instant Teleport Loop with 1-second delay
 for _, pos in ipairs(positions) do
     humanoidRootPart.CFrame = CFrame.new(pos)
     checkForBonds(pos)
-    task.wait(0.05) -- Small delay for GUI update
+    task.wait(1) -- 1-second delay between each teleport
 end
 
 print("Teleporting complete. Total Bonds Found: " .. bondCount)
