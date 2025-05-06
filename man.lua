@@ -61,14 +61,14 @@ local startTime = tick()
 
 task.spawn(function()
     while true do
-        task.wait(120)
+        task.wait(1)
         local elapsedTime = math.floor(tick() - startTime)
         timerLabel.Text = "Time: " .. elapsedTime .. "s"
     end
 end)
 
 task.spawn(function()
-    task.wait(1)
+    task.wait(120)
     screenGui:Destroy()
 end)
 
