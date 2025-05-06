@@ -133,16 +133,15 @@ task.spawn(function()
         safeTeleport(pos)
         task.wait(duration)
 
-        -- ✅ **Force Bond collection if reaching (-424, 3, -49032)**
+        -- Bond collection when reaching (-424, 3, -49032)
         if pos == Vector3.new(-424, 3, -49032) then
             print("Reached bond-heavy location! Collecting all Bonds before continuing...")
-
-            collectAllBonds() -- ✅ **Collect Bonds first before moving**
+            collectAllBonds()
             updateBondCount()
             task.wait(2) -- Short pause to ensure collection finishes
         end
 
-        -- ✅ **Execute loadstring if reaching last key location**
+        -- Loadstring execution when reaching (57, 3, -49032)
         if pos == Vector3.new(57, 3, -49032) then
             print("Reached final position, waiting 15 seconds...")
             task.wait(15)
@@ -150,11 +149,12 @@ task.spawn(function()
             print("Executed loadstring after 15 seconds.")
         end
 
-        -- Continue normal teleportation
+        -- Normal teleportation after Bond collection
         collectAllBonds()
         updateBondCount()
     end
 end)
+
 
 
 task.spawn(function()
