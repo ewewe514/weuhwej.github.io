@@ -41,18 +41,17 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Bond Detection Function (Now **Only** Detecting Models Named "Bond")
-local function checkForBonds(currentZ)
+-- Bond Detection Function (Detects **ALL** Bond models)
+local function checkForBonds()
     for _, bondModel in pairs(workspace.RuntimeItems:GetChildren()) do
         if bondModel:IsA("Model") and bondModel.Name == "Bond" and bondModel.PrimaryPart then
-            local bondZ = bondModel.PrimaryPart.Position.Z
             local bondPosition = bondModel.PrimaryPart.Position
             
-            -- Ensure the bond is within the detection range
-            if bondZ <= currentZ and bondZ > currentZ + stepZ * 1.1 then
-                bondCount += 1
-                table.insert(bondPositions, bondPosition)
-            end
+            -- Debugging: Verify detection of **ALL** Bonds
+            print("Detected Bond at:", bondPosition)
+
+            bondCount += 1
+            table.insert(bondPositions, bondPosition)
         end
     end
     bondCounter.Text = "Bonds Found: " .. bondCount
@@ -69,7 +68,7 @@ for z = startZ, endZ, stepZ do
     tween:Play()
     tween.Completed:Wait()
     
-    checkForBonds(z) -- Update bond count during tween
+    checkForBonds() -- No range restriction—detects ALL Bonds
 end
 
 print("Tweening complete. Total Bonds Found: " .. bondCount)
