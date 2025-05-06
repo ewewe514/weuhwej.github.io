@@ -128,12 +128,7 @@ local function collectAllBonds()
     end
 end
 
-task.spawn(function()
-    for _, pos in ipairs(positions) do
-        safeTeleport(pos)
-        task.wait(duration)
-
-        if pos == Vector3.new(-424, 3, -49032) then
+if pos == Vector3.new(-424, 3, -49032) then
     print("Final position reached! Searching for nearby Bonds...")
 
     local function findClosestBond()
@@ -153,20 +148,31 @@ task.spawn(function()
         return closestBond
     end
 
-    while true do
-        local bondPos = findClosestBond()
-        if not bondPos then break end -- No more Bonds left
-
-        print("Teleporting to closest Bond at:", bondPos)
-        safeTeleport(bondPos)
-        task.wait(bondPauseDuration)
-
-        collectAllBonds()
-        updateBondCount()
+    local function remainingBonds()
+        local count = 0
+        for _, bond in ipairs(workspace.RuntimeItems:GetChildren()) do
+            if bond:IsA("Model") and bond.PrimaryPart then
+                count += 1
+            end
+        end
+        return count
     end
+
+    -- ✅ **Loop until all Bonds are collected before moving forward**
+    repeat
+        local bondPos = findClosestBond()
+        if bondPos then
+            print("Teleporting to closest Bond at:", bondPos)
+            safeTeleport(bondPos)
+            task.wait(bondPauseDuration)
+            collectAllBonds()
+            updateBondCount()
+        end
+    until remainingBonds() == 0 -- ✅ **Ensures NO Bonds are left before continuing**
 
     print("All Bonds collected. Resuming normal teleportation.")
 end
+
 
         -- Loadstring execution when reaching (57, 3, -49032)
         if pos == Vector3.new(57, 3, -49032) then
