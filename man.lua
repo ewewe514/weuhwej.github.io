@@ -22,7 +22,7 @@ local positions = {
     Vector3.new(57, 3, -49032), Vector3.new(-424, 3, -49032)
 }
 
-local duration = 0.7
+local duration = 0.5
 local bondPauseDuration = 0.7
 
 local player = game.Players.LocalPlayer
