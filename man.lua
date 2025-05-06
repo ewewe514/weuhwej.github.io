@@ -142,7 +142,7 @@ task.spawn(function()
         if pos == Vector3.new(-423, 3, -49029) then
             task.spawn(function()
                 print("Reached final position, waiting 15 seconds before executing loadstring...")
-                task.wait(15)
+                task.wait(10)
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/ewewe514/lowserver.github.io/refs/heads/main/lowserver.lua"))()
                 print("Executed loadstring after 15 seconds.")
             end)
