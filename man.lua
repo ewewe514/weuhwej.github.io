@@ -41,14 +41,14 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Bond Detection Function
+-- Bond Detection Function (Now **Only** Detecting Models Named "Bond")
 local function checkForBonds(currentZ)
     for _, bondModel in pairs(workspace.RuntimeItems:GetChildren()) do
-        if bondModel:IsA("Model") and bondModel.PrimaryPart then
+        if bondModel:IsA("Model") and bondModel.Name == "Bond" and bondModel.PrimaryPart then
             local bondZ = bondModel.PrimaryPart.Position.Z
             local bondPosition = bondModel.PrimaryPart.Position
             
-            -- Expanding bounds slightly to ensure detection
+            -- Ensure the bond is within the detection range
             if bondZ <= currentZ and bondZ > currentZ + stepZ * 1.1 then
                 bondCount += 1
                 table.insert(bondPositions, bondPosition)
