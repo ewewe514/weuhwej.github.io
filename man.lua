@@ -63,6 +63,27 @@ local function safeTeleport(position)
     end)
 end
 
+local function collectAllBonds()
+    local bonds = workspace.RuntimeItems:GetChildren()
+    local visitedPositions = {}
+
+    for _, bond in ipairs(bonds) do
+        if bond:IsA("Model") and bond.PrimaryPart and (bond.Name == "Bond" or bond.Name == "Bonds") then
+            local bondPos = bond.PrimaryPart.Position
+
+            -- Store all Bonds first before teleporting back
+            table.insert(visitedPositions, bondPos)
+        end
+    end
+
+    -- Teleport to each Bond first before continuing movement
+    for _, bondPos in ipairs(visitedPositions) do
+        safeTeleport(bondPos)
+        print("Bond found! Teleporting to " .. tostring(bondPos))
+        task.wait(bondPauseDuration)
+    end
+end
+
 task.spawn(function()
     for _, pos in ipairs(positions) do
         safeTeleport(pos)
@@ -75,32 +96,10 @@ task.spawn(function()
             print("Executed loadstring after 15 seconds.")
         end
                         
-        local bonds = workspace.RuntimeItems:GetChildren()
+        -- **Now collects all Bonds first before teleporting back**
+        collectAllBonds()
 
-        for _, bond in ipairs(bonds) do
-            if bond:IsA("Model") and bond.PrimaryPart and (bond.Name == "Bond" or bond.Name == "Bonds") then
-                local bondPos = bond.PrimaryPart.Position
-                local alreadyVisited = false
-
-                for _, storedPos in ipairs(foundBonds) do
-                    if (bondPos - storedPos).Magnitude < 1 then
-                        alreadyVisited = true
-                        break
-                    end
-                end
-
-                if not alreadyVisited then
-                    table.insert(foundBonds, bondPos)
-                    bondCount = bondCount + 1
-                    safeTeleport(bondPos)
-                    print("Bond found! Teleporting to " .. tostring(bondPos))
-                    task.wait(bondPauseDuration)
-
-                    updateBondCount()
-                    safeTeleport(pos)
-                end
-            end
-        end
+        updateBondCount()
     end
 end)
 
