@@ -22,13 +22,14 @@ local positions = {
     Vector3.new(57, 3, -49032), Vector3.new(-424, 3, -49032)
 }
 
-local duration = 0.7
+local duration = 0.5
 local bondPauseDuration = 0.7
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
+-- GUI Setup (Includes Timer)
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player:FindFirstChildOfClass("PlayerGui")
 
@@ -42,6 +43,29 @@ bondCounter.Font = Enum.Font.SourceSansBold
 bondCounter.TextColor3 = Color3.fromRGB(255, 255, 255)
 bondCounter.Text = "Bonds Found: 0"
 bondCounter.Parent = screenGui
+
+-- **Live Timer GUI**
+local timerLabel = Instance.new("TextLabel")
+timerLabel.Size = UDim2.new(0.2, 0, 0.05, 0)
+timerLabel.Position = UDim2.new(0.5, 0, 0.8, 0)
+timerLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+timerLabel.BackgroundTransparency = 0.5
+timerLabel.TextScaled = true
+timerLabel.Font = Enum.Font.SourceSansBold
+timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+timerLabel.Text = "Time: 0s"
+timerLabel.Parent = screenGui
+
+-- Start time tracking
+local startTime = tick()
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        local elapsedTime = math.floor(tick() - startTime)
+        timerLabel.Text = "Time: " .. elapsedTime .. "s"
+    end
+end)
 
 task.spawn(function()
     task.wait(1)
