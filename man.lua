@@ -19,7 +19,7 @@ local positions = {
     Vector3.new(57, 3, -38000), Vector3.new(57, 3, -40000),
     Vector3.new(57, 3, -42000), Vector3.new(57, 3, -44000),
     Vector3.new(57, 3, -46000), Vector3.new(57, 3, -48000),
-    Vector3.new(57, 3, -49032)
+    Vector3.new(57, 3, -49032), Vector3.new(-424, 3, -49032)
 }
 
 local duration = 0.7
