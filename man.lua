@@ -2,29 +2,19 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-local positions = {
-    Vector3.new(57, 3, 30000), Vector3.new(57, 3, 28000),
-    Vector3.new(57, 3, 26000), Vector3.new(57, 3, 24000),
-    Vector3.new(57, 3, 22000), Vector3.new(57, 3, 20000),
-    Vector3.new(57, 3, 18000), Vector3.new(57, 3, 16000),
-    Vector3.new(57, 3, 14000), Vector3.new(57, 3, 12000),
-    Vector3.new(57, 3, 10000), Vector3.new(57, 3, 8000),
-    Vector3.new(57, 3, 6000), Vector3.new(57, 3, 4000),
-    Vector3.new(57, 3, 2000), Vector3.new(57, 3, 0),
-    Vector3.new(57, 3, -2000), Vector3.new(57, 3, -4000),
-    Vector3.new(57, 3, -6000), Vector3.new(57, 3, -8000),
-    Vector3.new(57, 3, -10000), Vector3.new(57, 3, -12000),
-    Vector3.new(57, 3, -14000), Vector3.new(57, 3, -16000),
-    Vector3.new(57, 3, -18000), Vector3.new(57, 3, -20000),
-    Vector3.new(57, 3, -22000), Vector3.new(57, 3, -24000),
-    Vector3.new(57, 3, -26000), Vector3.new(57, 3, -28000),
-    Vector3.new(57, 3, -30000), Vector3.new(57, 3, -32000),
-    Vector3.new(57, 3, -34000), Vector3.new(57, 3, -36000),
-    Vector3.new(57, 3, -38000), Vector3.new(57, 3, -40000),
-    Vector3.new(57, 3, -42000), Vector3.new(57, 3, -44000),
-    Vector3.new(57, 3, -46000), Vector3.new(57, 3, -48000),
-    Vector3.new(57, 3, -49032)
-}
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local x = 57
+local y = 3
+local startZ = 30000
+local endZ = -49032.99
+local stepZ = -2000
+local duration = 0.5
+local stopTweening = false
+
+local teleportCount = 10
+local delayTime = 0.1
 
 -- GUI Setup
 local screenGui = Instance.new("ScreenGui")
@@ -40,27 +30,64 @@ bondCounter.Text = "Bonds Found: 0"
 bondCounter.Parent = screenGui
 
 local bondCount = 0
+local bondPositions = {}
+
+-- Disable Collisions
+RunService.Stepped:Connect(function()
+    for _, descendant in pairs(character:GetDescendants()) do
+        if descendant:IsA("BasePart") then
+            descendant.CanCollide = false
+        end
+    end
+end)
 
 -- Bond Detection Function
-local function checkForBonds(currentPos)
+local function checkForBonds(currentZ)
     for _, bondModel in pairs(workspace.RuntimeItems:GetChildren()) do
         if bondModel:IsA("Model") and bondModel.PrimaryPart then
             local bondZ = bondModel.PrimaryPart.Position.Z
+            local bondPosition = bondModel.PrimaryPart.Position
             
-            -- Ensuring bond is detected at or near current position
-            if math.abs(bondZ - currentPos.Z) <= 500 then
+            -- Expanding bounds slightly to ensure detection
+            if bondZ <= currentZ and bondZ > currentZ + stepZ * 1.1 then
                 bondCount += 1
+                table.insert(bondPositions, bondPosition)
             end
         end
     end
     bondCounter.Text = "Bonds Found: " .. bondCount
 end
 
--- Instant Teleport Loop with 1-second delay
-for _, pos in ipairs(positions) do
-    humanoidRootPart.CFrame = CFrame.new(pos)
-    checkForBonds(pos)
-    task.wait(1) -- 1-second delay between each teleport
+-- Tween Loop
+for z = startZ, endZ, stepZ do
+    if stopTweening then break end
+    local adjustedY = math.max(y, 3)
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    local goal = {CFrame = CFrame.new(Vector3.new(x, adjustedY, z))}
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
+    
+    tween:Play()
+    tween.Completed:Wait()
+    
+    checkForBonds(z) -- Update bond count during tween
 end
 
-print("Teleporting complete. Total Bonds Found: " .. bondCount)
+print("Tweening complete. Total Bonds Found: " .. bondCount)
+
+-- Wait 3 seconds before teleporting to each bond
+task.wait(3)
+
+-- Teleport to each bond location with a 0.8-second delay, unless bonds are close together
+local lastPos = nil
+
+for _, bondPos in ipairs(bondPositions) do
+    if lastPos and (bondPos - lastPos).Magnitude <= 10 then
+        continue -- Skip teleport if the bond is within 10 studs of the previous one
+    end
+    
+    humanoidRootPart.CFrame = CFrame.new(bondPos)
+    lastPos = bondPos
+    task.wait(0.8)
+end
+
+print("Teleportation to all bonds completed.")
