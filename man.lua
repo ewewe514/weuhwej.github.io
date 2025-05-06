@@ -84,7 +84,7 @@ local function safeTeleport(position)
         task.spawn(function() -- Stream while teleporting instead of waiting
             game.Players.LocalPlayer:RequestStreamAroundAsync(position)
         end)
-        task.wait(0.2) -- Lowered streaming delay
+        task.wait(0.5) -- Lowered streaming delay
         hrp.CFrame = CFrame.new(position) -- Teleport after streaming
     end)
 end
